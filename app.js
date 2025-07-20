@@ -12,6 +12,7 @@ const resultScreen = document.getElementById('resultScreen');
 const sectionButtonsContainer = document.getElementById('sectionButtons');
 const typeButtonsContainer = document.getElementById('typeButtons');
 const startQuizBtn = document.getElementById('startQuizBtn');
+const selectedSectionDescription = document.getElementById('selectedSectionDescription'); // New element
 
 const currentQuestionNumberSpan = document.getElementById('currentQuestionNumber');
 const totalQuestionsSpan = document.getElementById('totalQuestions');
@@ -46,6 +47,17 @@ let currentQuestionIndex = 0;
 let userAnswers = []; // Stores user's selected option index for each question
 let quizStarted = false; // To prevent multiple starts
 
+// --- Section Descriptions (New) ---
+const sectionDescriptions = {
+    "Survei dan Pemetaan": "Seksi ini menguji pengetahuan Anda tentang teknik survei, penggunaan alat GNSS, drone, dan pengolahan data spasial untuk pemetaan dan pengukuran.",
+    "Penetapan Hak dan Pendaftaran": "Seksi ini berfokus pada pemahaman Anda tentang prosedur dan regulasi terkait penetapan hak atas tanah, pendaftaran tanah pertama kali, dan pemeliharaan data pertanahan.",
+    "Penataan dan Pemberdayaan": "Seksi ini menguji kemampuan Anda dalam merencanakan dan melaksanakan program penataan lahan, konsolidasi tanah, serta pemberdayaan masyarakat terkait pertanahan.",
+    "Pengadaan Tanah dan Pengembangan": "Seksi ini mencakup pengetahuan tentang regulasi pengadaan tanah untuk kepentingan umum, negosiasi, penilaian tanah, dan proses pengembangan wilayah.",
+    "Pengendalian dan Penanganan Sengketa": "Seksi ini menguji pemahaman Anda tentang jenis-jenis sengketa pertanahan, prosedur mediasi, arbitrase, dan penyelesaian konflik agraria.",
+    "Tata Usaha": "Seksi ini berfokus pada kompetensi administrasi perkantoran, manajemen dokumen, korespondensi, dan sistem informasi dalam lingkungan kementerian/lembaga."
+};
+
+
 // --- Utility Functions ---
 
 // Shuffles an array (Fisher-Yates algorithm)
@@ -71,12 +83,17 @@ function renderSectionButtons() {
     sectionButtonsContainer.innerHTML = '';
     if (sections && sections.length > 0) {
         sections.forEach(section => {
-            const button = document.createElement('button');
-            button.textContent = section;
-            button.classList.add('quiz-option-button');
-            button.addEventListener('click', () => selectSection(section, button));
-            sectionButtonsContainer.appendChild(button);
-            console.log(`renderSectionButtons: Tombol '${section}' ditambahkan.`);
+            const card = document.createElement('div');
+            card.classList.add('section-card');
+            card.innerHTML = `
+                <h3 class="text-lg font-semibold text-gray-800">${section}</h3>
+                <p class="text-sm text-gray-600">${sectionDescriptions[section] || "Deskripsi tidak tersedia."}</p>
+                <button class="quiz-option-button" data-section="${section}">Pilih Seksi</button>
+            `;
+            // Attach event listener to the button inside the card
+            card.querySelector('button').addEventListener('click', () => selectSection(section, card));
+            sectionButtonsContainer.appendChild(card);
+            console.log(`renderSectionButtons: Kartu '${section}' ditambahkan.`);
         });
     } else {
         console.warn("renderSectionButtons: Array 'sections' kosong atau tidak terdefinisi.");
@@ -90,12 +107,17 @@ function renderTypeButtons() {
     typeButtonsContainer.innerHTML = '';
     if (testTypes && testTypes.length > 0) {
         testTypes.forEach(type => {
-            const button = document.createElement('button');
-            button.textContent = type.toUpperCase(); // Display as MANSOKUL / TEKNIS
-            button.classList.add('quiz-option-button');
-            button.addEventListener('click', () => selectType(type, button));
-            typeButtonsContainer.appendChild(button);
-            console.log(`renderTypeButtons: Tombol '${type.toUpperCase()}' ditambahkan.`);
+            const card = document.createElement('div');
+            card.classList.add('type-card');
+            card.innerHTML = `
+                <h3 class="text-lg font-semibold text-gray-800">Tes ${type.toUpperCase()}</h3>
+                <p class="text-sm text-gray-600">50 Soal</p>
+                <button class="quiz-option-button" data-type="${type}">Pilih Tipe</button>
+            `;
+            // Attach event listener to the button inside the card
+            card.querySelector('button').addEventListener('click', () => selectType(type, card));
+            typeButtonsContainer.appendChild(card);
+            console.log(`renderTypeButtons: Kartu '${type.toUpperCase()}' ditambahkan.`);
         });
     } else {
         console.warn("renderTypeButtons: Array 'testTypes' kosong atau tidak terdefinisi.");
@@ -104,28 +126,33 @@ function renderTypeButtons() {
 }
 
 // Selects a section and updates UI
-function selectSection(section, button) {
+function selectSection(section, cardElement) {
     console.log(`selectSection: Seksi '${section}' dipilih.`);
     currentSection = section;
-    Array.from(sectionButtonsContainer.children).forEach(btn => {
-        btn.classList.remove('selected');
-        console.log(`selectSection: Menghapus 'selected' dari tombol: ${btn.textContent}`);
+    Array.from(sectionButtonsContainer.children).forEach(card => {
+        card.classList.remove('selected');
+        console.log(`selectSection: Menghapus 'selected' dari kartu: ${card.querySelector('h3').textContent}`);
     });
-    button.classList.add('selected');
-    console.log(`selectSection: Menambahkan 'selected' ke tombol: ${button.textContent}`);
+    cardElement.classList.add('selected');
+    console.log(`selectSection: Menambahkan 'selected' ke kartu: ${cardElement.querySelector('h3').textContent}`);
+
+    // Update section description (New)
+    selectedSectionDescription.textContent = sectionDescriptions[section] || "Deskripsi seksi tidak tersedia.";
+    selectedSectionDescription.classList.remove('hidden');
+
     checkStartButtonStatus();
 }
 
 // Selects a test type and updates UI
-function selectType(type, button) {
+function selectType(type, cardElement) {
     console.log(`selectType: Tipe '${type}' dipilih.`);
     currentType = type;
-    Array.from(typeButtonsContainer.children).forEach(btn => {
-        btn.classList.remove('selected');
-        console.log(`selectType: Menghapus 'selected' dari tombol: ${btn.textContent}`);
+    Array.from(typeButtonsContainer.children).forEach(card => {
+        card.classList.remove('selected');
+        console.log(`selectType: Menghapus 'selected' dari kartu: ${card.querySelector('h3').textContent}`);
     });
-    button.classList.add('selected');
-    console.log(`selectType: Menambahkan 'selected' ke tombol: ${button.textContent}`);
+    cardElement.classList.add('selected');
+    console.log(`selectType: Menambahkan 'selected' ke kartu: ${cardElement.querySelector('h3').textContent}`);
     checkStartButtonStatus();
 }
 
@@ -151,11 +178,13 @@ function displayQuestion() {
     optionsContainer.innerHTML = '';
     feedbackContainer.classList.add('hidden'); // Hide feedback for new question
 
+    const optionLabels = ['A', 'B', 'C', 'D', 'E']; // Assuming max 5 options
+
     question.options.forEach((option, index) => {
         const button = document.createElement('button');
-        button.textContent = option;
         button.classList.add('quiz-answer-button');
         button.dataset.index = index; // Store index for easy access
+        button.innerHTML = `<span class="option-label">${optionLabels[index]}.</span> ${option}`; // Add A, B, C, D label
 
         // If user has already answered this question, show their selection
         if (userAnswers[currentQuestionIndex] !== undefined) {
@@ -315,9 +344,11 @@ function retakeQuiz() {
     currentSection = null;
     currentType = null;
     // Deselect buttons
-    Array.from(sectionButtonsContainer.children).forEach(btn => btn.classList.remove('selected'));
-    Array.from(typeButtonsContainer.children).forEach(btn => btn.classList.remove('selected'));
+    Array.from(sectionButtonsContainer.children).forEach(card => card.classList.remove('selected'));
+    Array.from(typeButtonsContainer.children).forEach(card => card.classList.remove('selected'));
     startQuizBtn.disabled = true; // Disable start button
+    selectedSectionDescription.classList.add('hidden'); // Hide description on retake
+    selectedSectionDescription.textContent = ''; // Clear description
 }
 
 // --- Local Storage for History ---
