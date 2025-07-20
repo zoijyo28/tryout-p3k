@@ -1,0 +1,28 @@
+README.txt
+
+Proyek Aplikasi Kuis Interaktif PPPK ATRBPN
+
+Struktur Folder:
+- /index.html: Halaman utama aplikasi kuis.
+- /style.css: File CSS (menggunakan Tailwind CSS via CDN, jadi file ini mungkin kosong).
+- /app.js: Logika utama aplikasi kuis (navigasi, feedback, skor, riwayat).
+- /questions.js: Berisi data soal kuis untuk seluruh seksi dan tipe tes.
+- /competencies.js: Berisi definisi kompetensi beserta penjelasan.
+- /assets/: Folder kosong untuk ikon atau gambar jika diperlukan di masa mendatang.
+- /README.txt: File penjelasan ini.
+
+Cara Menjalankan Aplikasi:
+1. Pastikan Anda memiliki semua file di atas dalam struktur folder yang benar.
+2. Buka file `index.html` menggunakan browser web modern (Google Chrome, Mozilla Firefox, Microsoft Edge, dll.).
+3. Aplikasi akan langsung berjalan di browser Anda.
+
+Fitur:
+- Pilihan seksi dan tipe tes sebelum memulai kuis.
+- 600 soal unik yang relevan dengan PPPK ATRBPN.
+- Feedback langsung setelah menjawab (benar/salah) beserta penjelasan dan kompetensi yang diuji.
+- Navigasi soal (sebelumnya/berikutnya).
+- Skor akhir (persentase dan jumlah benar).
+- Riwayat tes tersimpan di browser Anda (menggunakan Local Storage).
+- Antarmuka pengguna yang responsif, bersih, dan modern.
+
+Selamat menggunakan aplikasi kuis ini!

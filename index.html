@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis PPPK ATRBPN</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        .container {
+            max-width: 960px;
+        }
+        .quiz-option-button {
+            @apply bg-white border border-gray-300 text-gray-800 py-3 px-6 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition ease-in-out duration-150;
+        }
+        .quiz-option-button.selected {
+            @apply bg-blue-600 text-white border-blue-600;
+        }
+        .quiz-answer-button {
+            @apply w-full text-left bg-white border border-gray-300 text-gray-800 py-3 px-4 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition ease-in-out duration-150 mb-2;
+        }
+        .quiz-answer-button.correct {
+            @apply bg-green-100 border-green-500 text-green-800;
+        }
+        .quiz-answer-button.incorrect {
+            @apply bg-red-100 border-red-500 text-red-800;
+        }
+        .quiz-answer-button.disabled {
+            @apply opacity-70 cursor-not-allowed;
+        }
+        .nav-button {
+            @apply bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition ease-in-out duration-150;
+        }
+        .nav-button:disabled {
+            @apply bg-gray-400 cursor-not-allowed;
+        }
+        .history-item {
+            @apply bg-white p-4 rounded-lg shadow-sm mb-3 border border-gray-200;
+        }
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <header class="bg-blue-700 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Kuis PPPK ATRBPN</h1>
+            <button id="viewHistoryBtn" class="bg-blue-800 hover:bg-blue-900 text-white py-2 px-4 rounded-lg shadow-sm transition ease-in-out duration-150">
+                Lihat Riwayat
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto p-6 flex flex-col items-center justify-center">
+
+        <!-- Quiz Selection Screen -->
+        <section id="quizSelectionScreen" class="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl text-center">
+            <h2 class="text-3xl font-semibold mb-6 text-gray-800">Pilih Seksi dan Tipe Tes</h2>
+
+            <div class="mb-8">
+                <h3 class="text-xl font-medium mb-4 text-gray-700">Seksi:</h3>
+                <div id="sectionButtons" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Section buttons will be dynamically loaded here by app.js -->
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-xl font-medium mb-4 text-gray-700">Tipe Tes:</h3>
+                <div id="typeButtons" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Type buttons will be dynamically loaded here by app.js -->
+                </div>
+            </div>
+
+            <button id="startQuizBtn" class="bg-green-600 text-white text-lg py-3 px-8 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition ease-in-out duration-150" disabled>
+                Mulai Kuis
+            </button>
+        </section>
+
+        <!-- Quiz Screen -->
+        <section id="quizScreen" class="hidden bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <p class="text-lg font-medium text-gray-700">Soal <span id="currentQuestionNumber">1</span> dari <span id="totalQuestions">50</span></p>
+                <p class="text-lg font-medium text-gray-700">Seksi: <span id="quizSectionName"></span> | Tipe: <span id="quizTypeName"></span></p>
+            </div>
+
+            <h3 id="questionText" class="text-xl font-semibold mb-6 text-gray-900"></h3>
+
+            <div id="optionsContainer" class="grid grid-cols-1 gap-3 mb-6">
+                <!-- Options will be dynamically loaded here -->
+            </div>
+
+            <div id="feedbackContainer" class="hidden p-4 mt-4 rounded-lg text-white font-medium">
+                <p id="feedbackText" class="mb-2"></p>
+                <p id="explanationText" class="text-sm"></p>
+                <p id="competencyText" class="text-xs mt-2"></p>
+            </div>
+
+            <div class="flex justify-between mt-6">
+                <button id="prevBtn" class="nav-button" disabled>Sebelumnya</button>
+                <button id="nextBtn" class="nav-button">Berikutnya</button>
+            </div>
+        </section>
+
+        <!-- Result Screen -->
+        <section id="resultScreen" class="hidden bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl text-center">
+            <h2 class="text-3xl font-semibold mb-6 text-gray-800">Hasil Kuis Anda</h2>
+            <p class="text-xl mb-4 text-gray-700">Skor: <span id="finalScorePercentage" class="font-bold text-blue-600"></span></p>
+            <p class="text-xl mb-6 text-gray-700">Jumlah Jawaban Benar: <span id="finalCorrectCount" class="font-bold text-green-600"></span> dari <span id="finalTotalQuestions" class="font-bold"></span></p>
+            <button id="retakeQuizBtn" class="bg-blue-600 text-white text-lg py-3 px-8 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition ease-in-out duration-150">
+                Ulangi Kuis
+            </button>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white p-4 text-center text-sm shadow-inner">
+        <p>&copy; 2025 Kuis PPPK ATRBPN. Dibuat dengan ❤️ untuk Ari.</p>
+    </footer>
+
+    <!-- History Modal -->
+    <div id="historyModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeHistoryModalBtn">&times;</span>
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Riwayat Kuis</h2>
+            <div id="historyList" class="max-h-96 overflow-y-auto">
+                <!-- History items will be loaded here -->
+                <p id="noHistoryMessage" class="text-gray-500">Belum ada riwayat kuis.</p>
+            </div>
+            <button id="clearHistoryBtn" class="bg-red-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-red-700 mt-4">
+                Hapus Riwayat
+            </button>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
