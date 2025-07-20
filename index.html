@@ -4,192 +4,571 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kuis PPPK ATRBPN</title>
-    <!-- Tailwind CSS CDN -->
+    <!-- Tailwind CSS CDN (tetap ada untuk kelas dasar yang mungkin digunakan) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts - Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Gaya dasar untuk body */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f0f2f5;
+            font-family: 'Inter', sans-serif; /* Menggunakan font Inter */
+            margin: 0;
+            background-color: #f0f2f5; /* Warna latar belakang lembut */
             color: #333;
-        }
-        .container {
-            max-width: 960px;
-        }
-        /* Styling dasar untuk kartu pilihan seksi/tipe */
-        .section-card, .type-card {
-            @apply bg-white border border-gray-300 rounded-lg shadow-sm p-6 flex flex-col items-center justify-center text-center h-auto cursor-pointer transition ease-in-out duration-150;
-        }
-        .section-card:hover, .type-card:hover {
-            @apply bg-gray-50 shadow-md transform -translate-y-1;
-        }
-        .section-card.selected, .type-card.selected {
-            @apply bg-blue-700 text-white border-blue-700 shadow-lg scale-105;
-            background-color: #1D4ED8 !important; /* Biru Tailwind 700 */
-            color: white !important;
-            border-color: #1D4ED8 !important;
-        }
-        /* Tombol di dalam kartu */
-        .section-card button, .type-card button {
-            @apply mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition ease-in-out duration-150;
+            display: flex;
+            flex-direction: column; /* Mengatur konten secara kolom */
+            justify-content: space-between; /* Untuk mendorong footer ke bawah */
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+            line-height: 1.6;
         }
 
-        .quiz-answer-button {
-            @apply w-full text-left bg-white border border-gray-300 text-gray-800 py-3 px-4 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition ease-in-out duration-150 mb-2 flex items-center; /* Added flex and items-center */
+        /* Gaya kontainer utama aplikasi */
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px; /* Sudut membulat */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Bayangan lebih dalam */
+            width: 100%;
+            max-width: 960px; /* Lebar maksimum lebih besar */
+            padding: 30px 50px;
+            box-sizing: border-box;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.8s forwards; /* Animasi fade-in */
+            margin-bottom: 20px; /* Tambahkan margin bawah agar tidak menempel footer */
         }
-        .quiz-answer-button.correct {
-            @apply bg-green-100 border-green-500 text-green-800;
+
+        /* Animasi fade-in */
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        .quiz-answer-button.incorrect {
-            @apply bg-red-100 border-red-500 text-red-800;
-        }
-        .quiz-answer-button.disabled {
-            @apply opacity-70 cursor-not-allowed;
-        }
-        .nav-button {
-            @apply bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition ease-in-out duration-150;
-        }
-        .nav-button:disabled {
-            @apply bg-gray-400 cursor-not-allowed;
-        }
-        .history-item {
-            @apply bg-white p-4 rounded-lg shadow-sm mb-3 border border-gray-200;
-        }
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 1000; /* Sit on top */
-            left: 0;
-            top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: auto;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            max-width: 500px;
-            width: 90%;
+
+        /* Gaya judul */
+        h1, h2, h3 {
+            color: #2c3e50;
             text-align: center;
+            margin-bottom: 25px;
+            font-weight: 700; /* Lebih tebal */
         }
-        .close-button {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
+
+        h1 { font-size: 2.5em; }
+        h2 { font-size: 2em; }
+        h3 { font-size: 1.6em; }
+
+        /* Gaya grid untuk pilihan seksi */
+        .section-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Kolom adaptif */
+            gap: 25px; /* Jarak antar kartu */
+            margin-top: 30px;
         }
-        .close-button:hover,
-        .close-button:focus {
-            color: black;
+
+        /* Gaya kartu seksi */
+        .section-card {
+            background-color: #ecf0f1;
+            border-radius: 10px;
+            padding: 25px;
+            text-align: left; /* Rata kiri */
+            cursor: pointer;
+            transition: all 0.3s ease; /* Transisi halus */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 1px solid #e0e0e0; /* Border tipis */
+        }
+
+        .section-card:hover {
+            background-color: #dfe6e9;
+            transform: translateY(-7px); /* Efek angkat */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .section-card.selected {
+            background-color: #3498db; /* Warna biru cerah saat terpilih */
+            color: white;
+            border-color: #3498db;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .section-card.selected h3, .section-card.selected p {
+            color: white; /* Pastikan teks di dalam kartu terpilih juga putih */
+        }
+
+        .section-card h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #34495e;
+            font-size: 1.4em;
+        }
+
+        .section-card p {
+            font-size: 0.95em;
+            color: #555;
+            flex-grow: 1;
+            margin-bottom: 20px;
+        }
+
+        /* Gaya untuk type-card (mirip section-card) */
+        .type-card {
+            background-color: #ecf0f1;
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center; /* Tetap rata tengah untuk tipe tes agar lebih ringkas */
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 1px solid #e0e0e0;
+        }
+
+        .type-card:hover {
+            background-color: #dfe6e9;
+            transform: translateY(-7px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .type-card.selected {
+            background-color: #3498db;
+            color: white;
+            border-color: #3498db;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .type-card.selected h3, .type-card.selected p {
+            color: white;
+        }
+
+
+        /* Gaya tombol */
+        .button {
+            display: inline-block;
+            background-color: #3498db; /* Warna biru cerah */
+            color: white;
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.05em;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            margin-top: 15px;
             text-decoration: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .button:hover {
+            background-color: #2980b9; /* Warna biru lebih gelap saat hover */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* Gaya untuk bagian soal dan hasil (tersembunyi secara default) */
+        .question-section, .result-section, .test-type-selection-section, .test-history-section {
+            display: none;
+            margin-top: 20px;
+        }
+
+        /* Gaya kontainer soal */
+        .question-container {
+            background-color: #fcfcfc;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .question-text {
+            font-size: 1.25em;
+            margin-bottom: 25px;
+            line-height: 1.7;
+            color: #444;
+            font-weight: 500;
+        }
+
+        /* Gaya opsi jawaban */
+        .options label {
+            display: block;
+            background-color: #f7f9fb;
+            border: 1px solid #dcdcdc;
+            padding: 18px 25px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            text-align: left; /* Opsi jawaban rata kiri */
+        }
+
+        .options label:hover {
+            background-color: #eaf1f7;
+            border-color: #c9d8e4;
+        }
+
+        .options input[type="radio"] {
+            margin-right: 18px;
+            transform: scale(1.3); /* Ukuran radio button lebih besar */
+            accent-color: #3498db;
             cursor: pointer;
         }
-        /* Styling untuk label A, B, C, D */
-        .option-label {
-            @apply font-bold text-gray-700 mr-3;
+
+        /* Gaya untuk opsi yang dipilih/benar/salah */
+        .options label.selected-correct {
+            background-color: #e6ffe6; /* Hijau muda */
+            border-color: #27ae60; /* Hijau */
+            color: #27ae60;
+        }
+
+        .options label.selected-incorrect {
+            background-color: #ffe6e6; /* Merah muda */
+            border-color: #e74c3c; /* Merah */
+            color: #e74c3c;
+        }
+
+        .options label.correct-answer {
+            background-color: #e6ffe6; /* Hijau muda */
+            border-color: #27ae60; /* Hijau */
+            color: #27ae60;
+        }
+
+        /* Gaya tombol navigasi */
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            flex-wrap: wrap; /* Untuk responsif */
+            gap: 15px; /* Jarak antar tombol */
+        }
+
+        .navigation-buttons .button {
+            margin-top: 0; /* Override margin-top dari .button */
+        }
+
+        /* Gaya penjelasan jawaban */
+        .explanation {
+            background-color: #e6f7ff; /* Warna biru muda */
+            border-left: 6px solid #3498db; /* Border kiri tebal */
+            padding: 20px 25px;
+            margin-top: 25px;
+            border-radius: 8px;
+            display: none; /* Tersembunyi secara default */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .explanation p {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 0.95em;
+        }
+        .explanation strong {
+            color: #3498db;
+        }
+
+        /* Gaya feedback jawaban */
+        .feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1.1em;
+            display: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+        }
+        .feedback.correct {
+            color: #27ae60; /* Hijau untuk benar */
+            background-color: #e6ffe6;
+            border: 1px solid #27ae60;
+        }
+        .feedback.incorrect {
+            color: #e74c3c; /* Merah untuk salah */
+            background-color: #ffe6e6;
+            border: 1px solid #e74c3c;
+        }
+
+        /* Gaya bagian hasil */
+        .result-section {
+            text-align: center;
+        }
+        .result-section p {
+            font-size: 1.15em;
+            margin-bottom: 12px;
+            color: #555;
+        }
+        .result-section strong {
+            color: #3498db;
+            font-weight: 700;
+        }
+        .result-section #userScore {
+            font-size: 2em;
+            color: #27ae60; /* Warna hijau untuk skor */
+            margin-top: 20px;
+            display: block;
+        }
+
+        /* Gaya tombol kembali */
+        .back-button {
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        /* Gaya loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9); /* Sedikit transparan */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.5s linear;
+        }
+
+        .loading-overlay.visible {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3498db;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #555;
+        }
+
+        /* Gaya untuk header autentikasi (disembunyikan) */
+        .auth-header {
+            display: none; /* Sembunyikan header auth */
+        }
+
+        /* Gaya untuk riwayat tes */
+        .test-history-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        .test-history-item {
+            background-color: #f7f9fb;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .test-history-item strong {
+            color: #34495e;
+        }
+
+        .test-history-item .score {
+            font-weight: bold;
+            color: #27ae60;
+            font-size: 1.1em;
+        }
+
+        /* Gaya Footer */
+        footer {
+            margin-top: auto; /* Mendorong footer ke bagian bawah */
+            padding: 20px;
+            text-align: center;
+            font-size: 0.85em;
+            color: #777;
+            background-color: #e9ecef;
+            border-top: 1px solid #dee2e6;
+            width: 100%;
+            box-sizing: border-box;
+            border-radius: 8px; /* Sudut membulat */
+        }
+
+        /* Media queries untuk responsif */
+        @media (max-width: 992px) {
+            .container {
+                max-width: 768px;
+                padding: 25px 35px;
+            }
+            .section-grid {
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+            .container {
+                padding: 20px 25px;
+                border-radius: 8px;
+            }
+            h1 { font-size: 2em; }
+            h2 { font-size: 1.7em; }
+            h3 { font-size: 1.4em; }
+            .section-grid {
+                grid-template-columns: 1fr; /* Satu kolom di layar kecil */
+                gap: 20px;
+            }
+            .section-card, .type-card {
+                padding: 20px;
+            }
+            .button {
+                padding: 10px 20px;
+                font-size: 0.95em;
+            }
+            .question-container {
+                padding: 20px;
+            }
+            .question-text {
+                font-size: 1.1em;
+            }
+            .options label {
+                padding: 15px 20px;
+            }
+            .navigation-buttons {
+                flex-direction: column; /* Tombol vertikal di layar kecil */
+                gap: 10px;
+            }
+            .navigation-buttons .button {
+                width: 100%;
+            }
         }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
-    <header class="bg-blue-700 text-white p-4 shadow-md">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold">Kuis PPPK ATRBPN</h1>
-            <button id="viewHistoryBtn" class="bg-blue-800 hover:bg-blue-900 text-white py-2 px-4 rounded-lg shadow-sm transition ease-in-out duration-150">
-                Lihat Riwayat
-            </button>
+<body>
+    <!-- Overlay loading -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p class="loading-text" id="loadingText">Memuat soal...</p>
+    </div>
+
+    <!-- Dashboard - Tampilan awal -->
+    <div class="container" id="dashboard">
+        <!-- Header autentikasi dihapus karena tidak ada Firebase -->
+        <!-- <div class="auth-header">
+            <div id="authStatus" class="auth-info"></div>
+            <div id="authButtons"></div>
+        </div> -->
+
+        <h1>Tes Kompetensi Manajerial dan Sosial Kultural</h1>
+        <p style="text-align: center; font-size: 1.1em; color: #555;">Selamat datang, Ari! Pilih seksi penempatan untuk memulai tes asesmen Anda di Kementerian ATR/BPN.</p>
+        <p style="text-align: center; font-size: 0.9em; color: #777;">Tes ini mengacu pada PermenPAN-RB No. 38 Tahun 2017.</p>
+
+        <div class="section-grid" id="sectionButtons">
+            <!-- Section cards will be dynamically loaded here by app.js -->
         </div>
-    </header>
+        
+        <div id="selectedSectionDescription" class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-gray-700 text-sm italic hidden">
+            <!-- Section description will be displayed here -->
+        </div>
 
-    <main class="flex-grow container mx-auto p-6 flex flex-col items-center justify-center">
-
-        <!-- Quiz Selection Screen -->
-        <section id="quizSelectionScreen" class="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl text-center">
-            <h2 class="text-3xl font-semibold mb-6 text-gray-800">Pilih Seksi dan Tipe Tes</h2>
-
-            <div class="mb-8">
-                <h3 class="text-xl font-medium mb-4 text-gray-700">Seksi:</h3>
-                <div id="sectionButtons" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Section cards will be dynamically loaded here by app.js -->
-                </div>
-                <div id="selectedSectionDescription" class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-gray-700 text-sm italic hidden">
-                    <!-- Section description will be displayed here -->
-                </div>
-            </div>
-
-            <div class="mb-8">
-                <h3 class="text-xl font-medium mb-4 text-gray-700">Tipe Tes:</h3>
-                <div id="typeButtons" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Type cards will be dynamically loaded here by app.js -->
-                </div>
-            </div>
-
-            <button id="startQuizBtn" class="bg-green-600 text-white text-lg py-3 px-8 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition ease-in-out duration-150" disabled>
-                Mulai Kuis
-            </button>
-        </section>
-
-        <!-- Quiz Screen -->
-        <section id="quizScreen" class="hidden bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl">
-            <div class="flex justify-between items-center mb-6">
-                <p class="text-lg font-medium text-gray-700">Soal <span id="currentQuestionNumber">1</span> dari <span id="totalQuestions">50</span></p>
-                <p class="text-lg font-medium text-gray-700">Seksi: <span id="quizSectionName"></span> | Tipe: <span id="quizTypeName"></span></p>
-            </div>
-
-            <h3 id="questionText" class="text-xl font-semibold mb-6 text-gray-900"></h3>
-
-            <div id="optionsContainer" class="grid grid-cols-1 gap-3 mb-6">
-                <!-- Options will be dynamically loaded here -->
-            </div>
-
-            <div id="feedbackContainer" class="hidden p-4 mt-4 rounded-lg text-white font-medium">
-                <p id="feedbackText" class="mb-2"></p>
-                <p id="explanationText" class="text-sm"></p>
-                <p id="competencyText" class="text-xs mt-2"></p>
-            </div>
-
-            <div class="flex justify-between mt-6">
-                <button id="prevBtn" class="nav-button" disabled>Sebelumnya</button>
-                <button id="nextBtn" class="nav-button">Berikutnya</button>
-            </div>
-        </section>
-
-        <!-- Result Screen -->
-        <section id="resultScreen" class="hidden bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl text-center">
-            <h2 class="text-3xl font-semibold mb-6 text-gray-800">Hasil Kuis Anda</h2>
-            <p class="text-xl mb-4 text-gray-700">Skor: <span id="finalScorePercentage" class="font-bold text-blue-600"></span></p>
-            <p class="text-xl mb-6 text-gray-700">Jumlah Jawaban Benar: <span id="finalCorrectCount" class="font-bold text-green-600"></span> dari <span id="finalTotalQuestions" class="font-bold"></span></p>
-            <button id="retakeQuizBtn" class="bg-blue-600 text-white text-lg py-3 px-8 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition ease-in-out duration-150">
-                Ulangi Kuis
-            </button>
-        </section>
-
-    </main>
-
-    <footer class="bg-gray-800 text-white p-4 text-center text-sm shadow-inner">
-        <p>&copy; 2025 Kuis PPPK ATRBPN. Dibuat dengan ❤️ untuk Ari.</p>
-    </footer>
-
-    <!-- History Modal -->
-    <div id="historyModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" id="closeHistoryModalBtn">&times;</span>
-            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Riwayat Kuis</h2>
-            <div id="historyList" class="max-h-96 overflow-y-auto">
-                <!-- History items will be loaded here -->
-                <p id="noHistoryMessage" class="text-gray-500">Belum ada riwayat kuis.</p>
-            </div>
-            <button id="clearHistoryBtn" class="bg-red-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-red-700 mt-4">
-                Hapus Riwayat
-            </button>
+        <div class="back-button" style="margin-top: 30px;">
+            <button class="button" id="btnViewHistory">Lihat Riwayat Tes</button>
         </div>
     </div>
+
+    <!-- Bagian Pemilihan Tipe Tes -->
+    <div class="container test-type-selection-section" id="testTypeSelectionSection">
+        <h2 id="testTypeSelectionTitle"></h2>
+        <p style="text-align: center; font-size: 1.1em; color: #555; margin-bottom: 30px;">Pilih jenis tes yang ingin Anda ikuti untuk seksi ini:</p>
+        <div class="section-grid" style="grid-template-columns: 1fr 1fr; max-width: 600px; margin: 0 auto; gap: 30px;" id="typeButtons">
+            <!-- Type cards will be dynamically loaded here by app.js -->
+        </div>
+        <button id="startQuizBtn" class="button" disabled style="margin-top: 30px;">
+            Mulai Kuis
+        </button>
+        <div class="back-button">
+            <button class="button" id="btnBackToDashboardFromTypeSelection">Kembali ke Dashboard</button>
+        </div>
+    </div>
+
+    <!-- Bagian Tes - Akan ditampilkan setelah memilih tipe tes -->
+    <div class="container question-section" id="questionSection">
+        <h2 id="currentSectionTitle"></h2>
+        <div id="questionContainer">
+            <!-- Soal akan dimuat secara dinamis di sini -->
+        </div>
+        <div class="navigation-buttons">
+            <button class="button" id="prevQuestionBtn">Soal Sebelumnya</button>
+            <button class="button" id="nextQuestionBtn">Soal Berikutnya</button>
+            <button class="button" id="submitTestBtn">Selesai Tes</button>
+        </div>
+        <div class="back-button">
+            <button class="button" id="btnBackToDashboardFromQuiz">Kembali ke Dashboard</button>
+        </div>
+    </div>
+
+    <!-- Bagian Riwayat Tes -->
+    <div class="container test-history-section" id="testHistorySection">
+        <h2>Riwayat Tes Anda</h2>
+        <p style="text-align: center; color: #777; font-size: 0.9em; margin-bottom: 20px;">Riwayat tes ini disimpan di browser Anda. Jika Anda menghapus data browser atau menggunakan perangkat lain, riwayat ini tidak akan terlihat.</p>
+        <div id="historyContent">
+            <p id="noHistoryMessage" style="text-align: center; color: #777; display: none;">Anda belum memiliki riwayat tes. Ikuti tes untuk menyimpannya!</p>
+            <ul id="testHistoryList" class="test-history-list">
+                <!-- Riwayat tes akan dimuat di sini -->
+            </ul>
+        </div>
+        <div class="back-button">
+            <button class="button" id="btnBackToDashboardFromHistory">Kembali ke Dashboard</button>
+        </div>
+    </div>
+
+    <!-- Bagian Hasil - Akan ditampilkan setelah tes selesai -->
+    <div class="container result-section" id="resultSection">
+        <h2>Hasil Tes Anda</h2>
+        <p>Seksi yang Diambil: <strong id="resultSectionName"></strong></p>
+        <p>Tipe Tes: <strong id="resultTestType"></strong></p>
+        <p>Total Soal Dijawab: <strong id="totalAnsweredQuestionsResult"></strong> dari <strong id="totalQuestionsResult"></strong></p>
+        <p>Jawaban Benar: <strong id="correctAnswersResult"></strong></p>
+        <p>Skor Anda: <strong id="userScore"></strong></p>
+        <div class="back-button">
+            <button class="button" id="btnBackToDashboardFromResult">Kembali ke Dashboard</button>
+        </div>
+    </div>
+
+    <footer>
+        Aplikasi ini hanya untuk pembelajaran, tidak menjamin soal keluar saat tes - Pabar Punya -
+    </footer>
 
     <script type="module" src="app.js"></script>
 </body>
