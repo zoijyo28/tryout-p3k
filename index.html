@@ -17,16 +17,26 @@
         .container {
             max-width: 960px;
         }
-        .quiz-option-button {
-            /* Styling dasar untuk tombol pilihan seksi/tipe */
-            @apply bg-white border border-gray-300 text-gray-800 py-3 px-6 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition ease-in-out duration-150;
+        /* Styling dasar untuk kartu pilihan seksi/tipe */
+        .section-card, .type-card {
+            @apply bg-white border border-gray-300 rounded-lg shadow-sm p-6 flex flex-col items-center justify-center text-center h-auto cursor-pointer transition ease-in-out duration-150;
         }
-        .quiz-option-button.selected {
-            /* Styling saat tombol terpilih - Dibuat lebih menonjol */
-            @apply bg-blue-700 text-white border-blue-700 shadow-lg scale-105; /* Lebih gelap, bayangan lebih kuat, sedikit membesar */
+        .section-card:hover, .type-card:hover {
+            @apply bg-gray-50 shadow-md transform -translate-y-1;
         }
+        .section-card.selected, .type-card.selected {
+            @apply bg-blue-700 text-white border-blue-700 shadow-lg scale-105;
+            background-color: #1D4ED8 !important; /* Biru Tailwind 700 */
+            color: white !important;
+            border-color: #1D4ED8 !important;
+        }
+        /* Tombol di dalam kartu */
+        .section-card button, .type-card button {
+            @apply mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition ease-in-out duration-150;
+        }
+
         .quiz-answer-button {
-            @apply w-full text-left bg-white border border-gray-300 text-gray-800 py-3 px-4 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition ease-in-out duration-150 mb-2;
+            @apply w-full text-left bg-white border border-gray-300 text-gray-800 py-3 px-4 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition ease-in-out duration-150 mb-2 flex items-center; /* Added flex and items-center */
         }
         .quiz-answer-button.correct {
             @apply bg-green-100 border-green-500 text-green-800;
@@ -81,6 +91,10 @@
             text-decoration: none;
             cursor: pointer;
         }
+        /* Styling untuk label A, B, C, D */
+        .option-label {
+            @apply font-bold text-gray-700 mr-3;
+        }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -102,14 +116,17 @@
             <div class="mb-8">
                 <h3 class="text-xl font-medium mb-4 text-gray-700">Seksi:</h3>
                 <div id="sectionButtons" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Section buttons will be dynamically loaded here by app.js -->
+                    <!-- Section cards will be dynamically loaded here by app.js -->
+                </div>
+                <div id="selectedSectionDescription" class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-gray-700 text-sm italic hidden">
+                    <!-- Section description will be displayed here -->
                 </div>
             </div>
 
             <div class="mb-8">
                 <h3 class="text-xl font-medium mb-4 text-gray-700">Tipe Tes:</h3>
                 <div id="typeButtons" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Type buttons will be dynamically loaded here by app.js -->
+                    <!-- Type cards will be dynamically loaded here by app.js -->
                 </div>
             </div>
 
