@@ -67,55 +67,79 @@ function getCompetencyDescription(name) {
 
 // Renders section selection buttons
 function renderSectionButtons() {
+    console.log("renderSectionButtons: Memulai rendering tombol seksi.");
     sectionButtonsContainer.innerHTML = '';
-    sections.forEach(section => {
-        const button = document.createElement('button');
-        button.textContent = section;
-        button.classList.add('quiz-option-button');
-        button.addEventListener('click', () => selectSection(section, button));
-        sectionButtonsContainer.appendChild(button);
-    });
+    if (sections && sections.length > 0) {
+        sections.forEach(section => {
+            const button = document.createElement('button');
+            button.textContent = section;
+            button.classList.add('quiz-option-button');
+            button.addEventListener('click', () => selectSection(section, button));
+            sectionButtonsContainer.appendChild(button);
+            console.log(`renderSectionButtons: Tombol '${section}' ditambahkan.`);
+        });
+    } else {
+        console.warn("renderSectionButtons: Array 'sections' kosong atau tidak terdefinisi.");
+        sectionButtonsContainer.innerHTML = '<p class="text-red-500">Gagal memuat pilihan seksi. Mohon periksa file questions.js.</p>';
+    }
 }
 
 // Renders test type selection buttons
 function renderTypeButtons() {
+    console.log("renderTypeButtons: Memulai rendering tombol tipe tes.");
     typeButtonsContainer.innerHTML = '';
-    testTypes.forEach(type => {
-        const button = document.createElement('button');
-        button.textContent = type.toUpperCase(); // Display as MANSOKUL / TEKNIS
-        button.classList.add('quiz-option-button');
-        button.addEventListener('click', () => selectType(type, button));
-        typeButtonsContainer.appendChild(button);
-    });
+    if (testTypes && testTypes.length > 0) {
+        testTypes.forEach(type => {
+            const button = document.createElement('button');
+            button.textContent = type.toUpperCase(); // Display as MANSOKUL / TEKNIS
+            button.classList.add('quiz-option-button');
+            button.addEventListener('click', () => selectType(type, button));
+            typeButtonsContainer.appendChild(button);
+            console.log(`renderTypeButtons: Tombol '${type.toUpperCase()}' ditambahkan.`);
+        });
+    } else {
+        console.warn("renderTypeButtons: Array 'testTypes' kosong atau tidak terdefinisi.");
+        typeButtonsContainer.innerHTML = '<p class="text-red-500">Gagal memuat pilihan tipe tes. Mohon periksa file questions.js.</p>';
+    }
 }
 
 // Selects a section and updates UI
 function selectSection(section, button) {
+    console.log(`selectSection: Seksi '${section}' dipilih.`);
     currentSection = section;
-    Array.from(sectionButtonsContainer.children).forEach(btn => btn.classList.remove('selected'));
+    Array.from(sectionButtonsContainer.children).forEach(btn => {
+        btn.classList.remove('selected');
+        console.log(`selectSection: Menghapus 'selected' dari tombol: ${btn.textContent}`);
+    });
     button.classList.add('selected');
+    console.log(`selectSection: Menambahkan 'selected' ke tombol: ${button.textContent}`);
     checkStartButtonStatus();
 }
 
 // Selects a test type and updates UI
 function selectType(type, button) {
+    console.log(`selectType: Tipe '${type}' dipilih.`);
     currentType = type;
-    Array.from(typeButtonsContainer.children).forEach(btn => btn.classList.remove('selected'));
+    Array.from(typeButtonsContainer.children).forEach(btn => {
+        btn.classList.remove('selected');
+        console.log(`selectType: Menghapus 'selected' dari tombol: ${btn.textContent}`);
+    });
     button.classList.add('selected');
+    console.log(`selectType: Menambahkan 'selected' ke tombol: ${button.textContent}`);
     checkStartButtonStatus();
 }
 
 // Enables/disables start quiz button based on selection
 function checkStartButtonStatus() {
     startQuizBtn.disabled = !(currentSection && currentType);
+    console.log(`checkStartButtonStatus: currentSection=${currentSection}, currentType=${currentType}. Tombol Mulai Kuis disabled: ${startQuizBtn.disabled}`);
 }
 
 // Displays the current question
 function displayQuestion() {
     const question = currentQuestions[currentQuestionIndex];
     if (!question) {
-        // This should not happen if logic is correct, but as a safeguard
-        console.error("Question not found at index:", currentQuestionIndex);
+        console.error("displayQuestion: Soal tidak ditemukan pada indeks:", currentQuestionIndex);
         return;
     }
 
@@ -217,32 +241,37 @@ function updateNavigationButtons() {
     }
 }
 
-// --- Quiz Navigation ---
-
-function goToNextQuestion() {
-    if (currentQuestionIndex < currentQuestions.length - 1) {
-        currentQuestionIndex++;
-        displayQuestion();
-    } else if (userAnswers[currentQuestionIndex] !== undefined) {
-        // All questions answered, show results
-        showResults();
-    }
-}
-
-function goToPrevQuestion() {
-    if (currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-        displayQuestion();
-    }
-}
-
 // --- Quiz Flow Control ---
 
 // Initializes and starts the quiz
 function startQuiz() {
     if (!currentSection || !currentType || quizStarted) return;
 
+    console.log(`startQuiz: Memulai kuis untuk Seksi: ${currentSection}, Tipe: ${currentType}`);
     quizStarted = true;
+    // Pastikan allQuestions[currentSection][currentType] tidak undefined
+    if (!allQuestions[currentSection] || !allQuestions[currentSection][currentType]) {
+        console.error("startQuiz: Data soal tidak ditemukan untuk seksi atau tipe yang dipilih.");
+        // Menggunakan modal kustom sebagai pengganti alert
+        const errorModal = document.createElement('div');
+        errorModal.classList.add('modal');
+        errorModal.innerHTML = `
+            <div class="modal-content">
+                <h2 class="text-xl font-semibold mb-4 text-red-600">Terjadi Kesalahan!</h2>
+                <p class="mb-6">Data soal tidak ditemukan untuk seksi atau tipe yang dipilih. Mohon coba lagi atau periksa file questions.js.</p>
+                <button id="closeErrorModalBtn" class="bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-700">Tutup</button>
+            </div>
+        `;
+        document.body.appendChild(errorModal);
+        errorModal.style.display = 'flex';
+        document.getElementById('closeErrorModalBtn').addEventListener('click', () => {
+            errorModal.remove();
+        });
+
+        quizStarted = false; // Reset flag
+        return;
+    }
+
     currentQuestions = shuffleArray([...allQuestions[currentSection][currentType]]);
     currentQuestionIndex = 0;
     userAnswers = new Array(currentQuestions.length).fill(undefined); // Reset answers
@@ -279,6 +308,7 @@ function showResults() {
 
 // Resets quiz to selection screen
 function retakeQuiz() {
+    console.log("retakeQuiz: Kembali ke layar pemilihan kuis.");
     quizSelectionScreen.classList.remove('hidden');
     quizScreen.classList.add('hidden');
     resultScreen.classList.add('hidden');
@@ -307,15 +337,18 @@ function saveQuizHistory(section, type, scorePercentage, correctCount, totalQues
     };
     history.push(newEntry);
     localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    console.log("saveQuizHistory: Riwayat kuis disimpan.", newEntry);
 }
 
 function loadQuizHistory() {
+    console.log("loadQuizHistory: Memuat riwayat kuis.");
     const history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
     historyList.innerHTML = ''; // Clear previous list
 
     if (history.length === 0) {
         noHistoryMessage.classList.remove('hidden');
         clearHistoryBtn.classList.add('hidden');
+        console.log("loadQuizHistory: Tidak ada riwayat kuis.");
     } else {
         noHistoryMessage.classList.add('hidden');
         clearHistoryBtn.classList.remove('hidden');
@@ -329,17 +362,44 @@ function loadQuizHistory() {
                 <p class="text-xs text-gray-500">Tanggal: ${entry.date}</p>
             `;
             historyList.appendChild(div);
+            console.log("loadQuizHistory: Menambahkan entri riwayat:", entry);
         });
     }
 }
 
 function clearQuizHistory() {
-    localStorage.removeItem(HISTORY_KEY);
-    loadQuizHistory(); // Reload to show empty message
+    // Menggunakan modal kustom sebagai pengganti alert/confirm
+    const confirmModal = document.createElement('div');
+    confirmModal.classList.add('modal');
+    confirmModal.innerHTML = `
+        <div class="modal-content">
+            <h2 class="text-xl font-semibold mb-4">Konfirmasi Hapus Riwayat</h2>
+            <p class="mb-6">Apakah Anda yakin ingin menghapus semua riwayat kuis?</p>
+            <div class="flex justify-center gap-4">
+                <button id="confirmClearBtn" class="bg-red-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-red-700">Ya, Hapus</button>
+                <button id="cancelClearBtn" class="bg-gray-300 text-gray-800 py-2 px-4 rounded-lg shadow-md hover:bg-gray-400">Batal</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(confirmModal);
+    confirmModal.style.display = 'flex';
+
+    document.getElementById('confirmClearBtn').addEventListener('click', () => {
+        localStorage.removeItem(HISTORY_KEY);
+        loadQuizHistory(); // Reload to show empty message
+        confirmModal.remove(); // Remove the modal
+        console.log("clearQuizHistory: Riwayat kuis dihapus.");
+    });
+
+    document.getElementById('cancelClearBtn').addEventListener('click', () => {
+        confirmModal.remove(); // Remove the modal
+        console.log("clearQuizHistory: Penghapusan riwayat dibatalkan.");
+    });
 }
 
 // --- Event Listeners ---
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOMContentLoaded: DOM sepenuhnya dimuat.");
     renderSectionButtons();
     renderTypeButtons();
     checkStartButtonStatus(); // Initial check
@@ -359,12 +419,7 @@ closeHistoryModalBtn.addEventListener('click', () => {
     historyModal.style.display = 'none'; // Hide modal
 });
 
-clearHistoryBtn.addEventListener('click', () => {
-    // Implement a simple confirmation for clearing history
-    if (confirm("Apakah Anda yakin ingin menghapus semua riwayat kuis?")) {
-        clearQuizHistory();
-    }
-});
+clearHistoryBtn.addEventListener('click', clearQuizHistory); // Menggunakan fungsi clearQuizHistory baru
 
 // Close modal if clicked outside content
 window.addEventListener('click', (event) => {
