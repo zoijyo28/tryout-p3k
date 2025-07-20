@@ -18,10 +18,12 @@
             max-width: 960px;
         }
         .quiz-option-button {
+            /* Styling dasar untuk tombol pilihan seksi/tipe */
             @apply bg-white border border-gray-300 text-gray-800 py-3 px-6 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition ease-in-out duration-150;
         }
         .quiz-option-button.selected {
-            @apply bg-blue-600 text-white border-blue-600;
+            /* Styling saat tombol terpilih - Dibuat lebih menonjol */
+            @apply bg-blue-700 text-white border-blue-700 shadow-lg scale-105; /* Lebih gelap, bayangan lebih kuat, sedikit membesar */
         }
         .quiz-answer-button {
             @apply w-full text-left bg-white border border-gray-300 text-gray-800 py-3 px-4 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition ease-in-out duration-150 mb-2;
